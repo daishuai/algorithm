@@ -22,7 +22,7 @@ public class BinaryTree {
         // 3.1、递归方式实现
         //inorderTraversalRecursion(node);
         // 3.2、非递归方式实现
-        inorderTraversalNonRecursion(node);
+        //inorderTraversalNonRecursion(node);
         // 4、二叉树的先序遍历（递归和非递归方式）
         // 4.1、递归方式实现
         //preorderTraversalRecursion(node);
@@ -32,7 +32,7 @@ public class BinaryTree {
         // 5.1、递归方式实现
         //postorderTraversalRecursion(node);
         // 5.2、非递归方式实现
-
+        postorderTraversalNonRecursion(node);
         // 6、判断一棵二叉树是否为搜索二叉树：左树比他小，右树比他大
 
         // 7、判断一颗二叉树是否为完全二叉树
@@ -150,7 +150,32 @@ public class BinaryTree {
      * @param root  二叉树的根节点
      */
     public static void postorderTraversalNonRecursion(Node root) {
-
+        if(root == null) {
+            return;
+        }
+        Map<Node, Node> parentNodeMap = new HashMap<>();
+        Stack<Node> stack = new Stack<>();
+        stack.add(root);
+        while (root.left != null) {
+            stack.add(root.left);
+            parentNodeMap.put(root.left, root);
+            root = root.left;
+        }
+        while (!stack.isEmpty()) {
+            Node node = stack.pop();
+            System.out.println(node.value);
+            Node parentNode = parentNodeMap.get(node);
+            if (parentNode == null || parentNode.right == null) {
+                continue;
+            }
+            parentNode = parentNode.right;
+            stack.add(parentNode);
+            while (parentNode.left != null) {
+                stack.add(parentNode.left);
+                parentNodeMap.put(parentNode.left, parentNode);
+                parentNode = parentNode.left;
+            }
+        }
     }
 
     /**
