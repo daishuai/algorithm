@@ -8,7 +8,7 @@ public class BinaryTree {
 
     public static void main(String[] args) {
 
-        String binaryTreeStr = "5_3_6_#_#_3_#_#_9_#_4_#_9_#_#";
+        String binaryTreeStr = "5_3_6_#_#_3_#_#_9_5_#_#_4_7_#_#_9_#_#";
 
         // 二叉树的反序列化
         Node node = preorderDeserializeBinaryTree(binaryTreeStr);
@@ -22,6 +22,7 @@ public class BinaryTree {
         // 3.1、递归方式实现
         //inorderTraversalRecursion(node);
         // 3.2、非递归方式实现
+        inorderTraversalNonRecursion(node);
         // 4、二叉树的先序遍历（递归和非递归方式）
         // 4.1、递归方式实现
         //preorderTraversalRecursion(node);
@@ -29,7 +30,7 @@ public class BinaryTree {
         //preorderTraversalNonRecursion(node);
         // 5、二叉树的后序遍历（递归和非递归方式）
         // 5.1、递归方式实现
-        postorderTraversalRecursion(node);
+        //postorderTraversalRecursion(node);
         // 5.2、非递归方式实现
 
         // 6、判断一棵二叉树是否为搜索二叉树：左树比他小，右树比他大
@@ -164,5 +165,27 @@ public class BinaryTree {
         inorderTraversalRecursion(node.left);
         System.out.println(node.value);
         inorderTraversalRecursion(node.right);
+    }
+
+    /**
+     * 非递归方式实现中序遍历
+     *
+     * @param root  二叉树根节点
+     */
+    public static void inorderTraversalNonRecursion(Node root) {
+        Stack<Node> stack = new Stack<>();
+        while (root != null) {
+            stack.add(root);
+            root = root.left;
+        }
+        while (!stack.isEmpty()) {
+            Node node = stack.pop();
+            System.out.println(node.value);
+            node = node.right;
+            while (node != null) {
+                stack.add(node);
+                node = node.left;
+            }
+        }
     }
 }
