@@ -9,6 +9,7 @@ public class BinaryTree {
     public static void main(String[] args) {
 
         String binaryTreeStr = "5_3_6_#_#_3_#_#_9_5_#_#_4_7_#_#_9_#_#";
+        //String binaryTreeStr = "5_3_6_#_2_#_#_3_#_#_9_5_#_#_4_#_9_#_#";
 
         // 二叉树的反序列化
         Node node = preorderDeserializeBinaryTree(binaryTreeStr);
@@ -32,14 +33,15 @@ public class BinaryTree {
         // 5.1、递归方式实现
         //postorderTraversalRecursion(node);
         // 5.2、非递归方式实现
-        postorderTraversalNonRecursion(node);
+        //postorderTraversalNonRecursion1(node);
+        //postorderTraversalNonRecursion2(node);
         // 6、判断一棵二叉树是否为搜索二叉树：左树比他小，右树比他大
 
-        // 7、判断一颗二叉树是否为完全二叉树
+        // 7、判断一棵二叉树是否为完全二叉树
 
-        // 8、判断一颗二叉树是否为满二叉树
+        // 8、判断一棵二叉树是否为满二叉树
 
-        // 9、判断一颗二叉树是否为平衡二叉树
+        // 9、判断一棵二叉树是否为平衡二叉树
 
         // 10、计算二叉树的宽度
 
@@ -145,35 +147,63 @@ public class BinaryTree {
     }
 
     /**
-     * 非递归方式实现二叉树的后序遍历
+     * 非递归方式实现二叉树的后序遍历1
      *
      * @param root  二叉树的根节点
      */
-    public static void postorderTraversalNonRecursion(Node root) {
+    public static void postorderTraversalNonRecursion1(Node root) {
         if(root == null) {
+            return;
+        }
+        Stack<Node> stack1 = new Stack<>();
+        Stack<Node> stack2 = new Stack<>();
+        stack1.add(root);
+        while (!stack1.isEmpty()) {
+            Node node = stack1.pop();
+            stack2.add(node);
+            if (node.left != null) {
+                stack1.add(node.left);
+            }
+            if (node.right != null) {
+                stack1.add(node.right);
+            }
+        }
+        while (!stack2.isEmpty()) {
+            System.out.println(stack2.pop().value);
+        }
+    }
+
+    /**
+     * 非递归方式实现二叉树后序遍历2
+     *
+     * @param root  二叉树根节点
+     */
+    public static void postorderTraversalNonRecursion2(Node root) {
+        if (root == null) {
             return;
         }
         Map<Node, Node> parentNodeMap = new HashMap<>();
         Stack<Node> stack = new Stack<>();
         stack.add(root);
-        while (root.left != null) {
-            stack.add(root.left);
-            parentNodeMap.put(root.left, root);
-            root = root.left;
-        }
-        while (!stack.isEmpty()) {
-            Node node = stack.pop();
-            System.out.println(node.value);
-            Node parentNode = parentNodeMap.get(node);
-            if (parentNode == null || parentNode.right == null) {
-                continue;
-            }
-            parentNode = parentNode.right;
-            stack.add(parentNode);
-            while (parentNode.left != null) {
-                stack.add(parentNode.left);
-                parentNodeMap.put(parentNode.left, parentNode);
-                parentNode = parentNode.left;
+        while (root.left != null || root.right != null || !stack.isEmpty()) {
+            if (root.left != null || root.right != null) {
+                if (root.left != null) {
+                    stack.add(root.left);
+                    parentNodeMap.put(root.left, root);
+                    root = root.left;
+                } else {
+                    stack.add(root.right);
+                    root = root.right;
+                }
+            } else {
+                Node node = stack.pop();
+                System.out.println(node.value);
+                Node parentNode = parentNodeMap.get(node);
+                if (parentNode == null || parentNode.right == null) {
+                    continue;
+                }
+                root = parentNode.right;
+                stack.add(root);
             }
         }
     }
@@ -199,18 +229,64 @@ public class BinaryTree {
      */
     public static void inorderTraversalNonRecursion(Node root) {
         Stack<Node> stack = new Stack<>();
-        while (root != null) {
-            stack.add(root);
-            root = root.left;
+        if (root == null) {
+            return;
         }
-        while (!stack.isEmpty()) {
-            Node node = stack.pop();
-            System.out.println(node.value);
-            node = node.right;
-            while (node != null) {
-                stack.add(node);
-                node = node.left;
+        while (!stack.isEmpty() || root != null) {
+            if (root != null) {
+                stack.add(root);
+                root = root.left;
+            } else {
+                root = stack.pop();
+                System.out.println(root.value);
+                root = root.right;
             }
         }
+    }
+
+    /**
+     * 判断一棵二叉树是否为搜索二叉树
+     *
+     * @param root  二叉树根节点
+     * @return  true or false
+     */
+    public static boolean isSearchBinaryTree(Node root) {
+
+        return false;
+    }
+
+    /**
+     * 判断一棵二叉树是否为完全二叉树
+     * 1、左子树为null，右子树不为null 返回false
+     * 2、宽度优先遍历，第一次遇到左右子树不全的，下面所有节点的左右子树都为null
+     *
+     * @param root  二叉树根节点
+     * @return  true or false
+     */
+    public static boolean isCompleteBinaryTree(Node root) {
+
+        return false;
+    }
+
+    /**
+     * 判断一棵二叉树是否为完全二叉树
+     *
+     * @param root  二叉树根节点
+     * @return  true or false
+     */
+    public static boolean isFullBinaryTree(Node root) {
+
+        return false;
+    }
+
+    /**
+     * 判断一棵树是否为平衡二叉树
+     * 1、左右子树高度差的绝对值不超过1
+     * @param root  二叉树根节点
+     * @return  true or false
+     */
+    public static boolean balancedBinaryTree(Node root) {
+
+        return false;
     }
 }
