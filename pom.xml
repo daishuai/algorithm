@@ -11,6 +11,7 @@
     <modules>
         <module>array-sort</module>
         <module>data-structure</module>
+        <module>dynamic-programming</module>
     </modules>
 
     <properties>
