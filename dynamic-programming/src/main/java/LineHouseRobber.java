@@ -1,7 +1,7 @@
 /**
  * @author Daishuai
  * @version 1.0.0
- * @className HouseRobber.java
+ * @className LineHouseRobber.java
  * @description 动态规划-斐波那契数列-强盗抢劫
  * 题目描述: 抢劫一排住户，但是不能抢邻近的住户，求最大抢劫量。
  * @createTime 2022年07月18日 23:41:00
