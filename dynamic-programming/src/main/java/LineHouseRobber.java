@@ -11,12 +11,12 @@ public class LineHouseRobber {
     public static void main(String[] args) {
         System.out.println(houseRobber());
         System.out.println(houseRobber(1));
-        System.out.println(houseRobber(2,1));
-        System.out.println(houseRobber(2,1,1));
-        System.out.println(houseRobber(1,3,1));
+        System.out.println(houseRobber(2, 1));
+        System.out.println(houseRobber(2, 1, 1));
+        System.out.println(houseRobber(1, 3, 1));
     }
 
-    public static int houseRobber(int ... values) {
+    public static int houseRobber(int... values) {
         int houses = values.length;
         if (houses == 0) {
             return 0;

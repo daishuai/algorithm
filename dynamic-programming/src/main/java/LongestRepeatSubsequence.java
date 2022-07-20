@@ -9,8 +9,8 @@
 public class LongestRepeatSubsequence {
 
     public static void main(String[] args) {
-        int[] nums1 = {1,2,3,2,1};
-        int[] nums2 = {3,2,1,4,7};
+        int[] nums1 = {1, 2, 3, 2, 1};
+        int[] nums2 = {3, 2, 1, 4, 7};
         System.out.println(lengthOfLRS(nums1, nums2));
     }
 
@@ -24,9 +24,9 @@ public class LongestRepeatSubsequence {
         int max = 0;
         int pre;
         int length;
-        for (int i=0; i<length1; i++) {
-            for (int j=0; j<length2; j++) {
-                pre =  i==0 || j==0 ? 0 :lengths[i-1][j-1];
+        for (int i = 0; i < length1; i++) {
+            for (int j = 0; j < length2; j++) {
+                pre = i == 0 || j == 0 ? 0 : lengths[i - 1][j - 1];
                 length = nums1[i] == nums2[j] ? pre + 1 : 0;
                 lengths[i][j] = length;
                 max = Math.max(max, length);
