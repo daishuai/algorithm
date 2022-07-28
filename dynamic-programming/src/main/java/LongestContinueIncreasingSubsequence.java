@@ -9,7 +9,7 @@
 public class LongestContinueIncreasingSubsequence {
 
     public static void main(String[] args) {
-        int[] nums = {1,3,5,4,7,6,8,9,10,5};
+        int[] nums = {1, 3, 5, 4, 7, 6, 8, 9, 10, 5};
         System.out.println(lengthOfLCIS(nums));
     }
 
@@ -22,8 +22,8 @@ public class LongestContinueIncreasingSubsequence {
         lengths[0] = 1;
         int max = 1;
         for (int i = 1; i < length; i++) {
-            if (nums[i] > nums[i-1]) {
-                lengths[i] = lengths[i-1] + 1;
+            if (nums[i] > nums[i - 1]) {
+                lengths[i] = lengths[i - 1] + 1;
             } else {
                 lengths[i] = 1;
             }

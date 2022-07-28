@@ -10,15 +10,15 @@ public class LongestIncreasingSubsequence {
 
     public static void main(String[] args) {
         System.out.println(lengthOfLIS(new int[]{10}));
-        System.out.println(lengthOfLIS(new int[]{10,9}));
-        System.out.println(lengthOfLIS(new int[]{10,9,2}));
-        System.out.println(lengthOfLIS(new int[]{10,9,2,5}));
-        System.out.println(lengthOfLIS(new int[]{10,9,2,5,3}));
-        System.out.println(lengthOfLIS(new int[]{10,9,2,5,3,7}));
-        System.out.println(lengthOfLIS(new int[]{10,9,2,5,3,7,101}));
-        System.out.println(lengthOfLIS(new int[]{10,9,2,5,3,7,101,18}));
-        System.out.println(lengthOfLIS(new int[]{0,1,0,3,2,3}));
-        System.out.println(lengthOfLIS(new int[]{1,3,6,7,9,4,10,5,6}));
+        System.out.println(lengthOfLIS(new int[]{10, 9}));
+        System.out.println(lengthOfLIS(new int[]{10, 9, 2}));
+        System.out.println(lengthOfLIS(new int[]{10, 9, 2, 5}));
+        System.out.println(lengthOfLIS(new int[]{10, 9, 2, 5, 3}));
+        System.out.println(lengthOfLIS(new int[]{10, 9, 2, 5, 3, 7}));
+        System.out.println(lengthOfLIS(new int[]{10, 9, 2, 5, 3, 7, 101}));
+        System.out.println(lengthOfLIS(new int[]{10, 9, 2, 5, 3, 7, 101, 18}));
+        System.out.println(lengthOfLIS(new int[]{0, 1, 0, 3, 2, 3}));
+        System.out.println(lengthOfLIS(new int[]{1, 3, 6, 7, 9, 4, 10, 5, 6}));
     }
 
     public static int lengthOfLIS(int[] numbs) {
@@ -35,7 +35,7 @@ public class LongestIncreasingSubsequence {
                 if (numbs[j] >= numbs[i]) {
                     continue;
                 }
-                lengths[i] = Math.max(lengths[i], lengths[j] +1);
+                lengths[i] = Math.max(lengths[i], lengths[j] + 1);
             }
             maxLength = Math.max(maxLength, lengths[i]);
         }
