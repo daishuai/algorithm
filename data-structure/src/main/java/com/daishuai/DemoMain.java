@@ -1,4 +1,7 @@
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+package com.daishuai;
+
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -11,7 +14,14 @@ import java.util.*;
 public class DemoMain {
 
     public static void main(String[] args) {
-        System.out.println(poorPigs(1, 12, 60));
+        String code = "CUSTOM_CONFIG";
+        int preIndex = 0;
+        String[] codes = code.split("\\.");
+        for (int i = 0; i < codes.length - 1; i++) {
+            int index = code.indexOf(".", preIndex);
+            System.out.println(code.substring(0, index));
+            preIndex = index + 1;
+        }
     }
 
     public static int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
