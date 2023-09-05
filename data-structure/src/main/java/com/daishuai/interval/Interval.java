@@ -2,7 +2,6 @@ package com.daishuai.interval;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.time.DateUtils;
 
 import java.util.Date;
 
@@ -37,7 +36,7 @@ public class Interval {
             return current;
         }
         //包含关系 current.start——start——end——current.end
-        if (current.start.before(start) && current.end.after(end)) {
+        if (!current.start.after(start) && !current.end.before(end)) {
             Node left = new Node(current.start, start, current.value);
             left.pre = current.pre;
             if (current.pre != null) {
@@ -56,28 +55,52 @@ public class Interval {
             return mid;
         }
         // 被包含 start-current.start-current.end-end
-        if (current.start.after(start) && current.end.before(end)) {
+        if (!current.start.before(start) && !current.end.after(end)) {
+            Node left;
             if (current.pre == null) {
-                current.pre = new Node(start, current.start, value);
+                left = new Node(start, current.start, value);
             } else {
-                this.insert(current.pre, start, current.start, value);
+                if (!current.pre.end.after(start)) {
+                    left = new Node(start, current.start, value);
+                    current.pre.next = left;
+                    left.pre = current.pre;
+                } else {
+                    left = this.insert(current.pre, start, current.start, value);
+                }
             }
+            Node right;
             if (current.next == null) {
-                current.next = new Node(current.end, end, value);
+                right = new Node(current.end, end, value);
             } else {
-                this.insert(current.next, current.end, end, value);
+                if (!current.next.start.before(end)) {
+                    right = new Node(current.end, end, value);
+                    current.next.pre = right;
+                    right.next = current.next;
+                } else {
+                    right = this.insert(current.next, current.end, end, value);
+                }
             }
+            left.next = current;
+            current.pre = left;
+            right.pre = current;
+            current.next = right;
             current.value += value;
             return current;
         }
         // 前面部分包含 start-current.start-end-current.end
-        if (current.start.after(start) && !end.before(current.start) && end.before(current.end)) {
+        if (!current.start.before(start) && !end.before(current.start)) {
             Node mid = new Node(current.start, end, current.value + value);
             Node left;
             if (current.pre == null) {
                 left = new Node(start, current.start, value);
             } else {
-                left = this.insert(current.pre, start, current.start, value);
+                if (!current.pre.end.after(start)) {
+                    left = new Node(start, current.start, value);
+                    current.pre.next = left;
+                    left.pre = current.pre;
+                } else {
+                    left = this.insert(current.pre, start, current.start, value);
+                }
             }
             Node right = new Node(end, current.end, current.value);
             right.next = current.next;
@@ -91,7 +114,7 @@ public class Interval {
             return mid;
         }
         // 后面部分包含 current.start-start-current.end-end
-        if (current.start.before(start) && !start.after(current.end) && current.end.before(end)) {
+        if (!current.start.after(start) && !start.after(current.end)) {
             Node mid = new Node(start, current.end, current.value + value);
             Node left = new Node(current.start, start, current.value);
             left.pre = current.pre;
@@ -101,7 +124,13 @@ public class Interval {
             if (current.next == null) {
                 right = new Node(current.end, end, value);
             } else {
-                right = this.insert(current.next, current.end, end, value);
+                if (!current.next.start.before(end)) {
+                    right = new Node(current.end, end, value);
+                    current.next.pre = right;
+                    right.next = current.next;
+                } else {
+                    right = this.insert(current.next, current.end, end, value);
+                }
             }
             while (right.pre != null && right.pre != current) {
                 right = right.pre;
@@ -116,7 +145,13 @@ public class Interval {
             if (current.pre == null) {
                 left = new Node(start, end, value);
             } else {
-                left = this.insert(current.pre, start, end, value);
+                if (!current.pre.end.after(start)) {
+                    left = new Node(start, end, value);
+                    current.pre.next = left;
+                    left.pre = current.pre;
+                } else {
+                    left = this.insert(current.pre, start, end, value);
+                }
             }
             while (left.next != null && left.next != current) {
                 left = left.next;
@@ -126,20 +161,23 @@ public class Interval {
             return current;
         }
         // 不包含在后面 current.start-current.end-start-end
-        if (!current.end.after(start)) {
-            Node right;
-            if (current.next == null) {
+        Node right;
+        if (current.next == null) {
+            right = new Node(start, end, value);
+        } else {
+            if (!current.next.start.before(end)) {
                 right = new Node(start, end, value);
+                current.next.pre = right;
+                right.next = current.next;
             } else {
                 right = this.insert(current.next, start, end, value);
             }
-            while (right.pre != null && right.pre != current) {
-                right = right.pre;
-            }
-            right.pre = current;
-            current.next = right;
-            return current;
         }
+        while (right.pre != null && right.pre != current) {
+            right = right.pre;
+        }
+        right.pre = current;
+        current.next = right;
         return current;
     }
 
@@ -151,44 +189,44 @@ public class Interval {
         if (current == null) {
             return false;
         }
-        //包含关系 root.start——start——end——start.end
+        //包含关系 current.start——start——end——current.end
         if (current.start.before(start) && current.end.after(end)) {
             return current.value + value > limit;
         }
-        // 被包含 start-root.start-root.end-end
+        // 被包含 start-current.start-current.end-end
         if (current.start.after(start) && current.end.before(end)) {
             boolean overLimit = current.value + value > limit;
-            if (!overLimit && current.pre != null) {
+            if (!overLimit && current.pre != null && current.pre.end.after(start)) {
                 overLimit = this.overLimit(current.pre, start, root.start, value);
             }
-            if (!overLimit && current.next != null) {
+            if (!overLimit && current.next != null && current.next.start.before(end)) {
                 overLimit = this.overLimit(current.next, root.end, end, value);
             }
             return overLimit;
         }
-        // 前面部分包含 start-root.start-end-root.end
+        // 前面部分包含 start-current.start-end-current.end
         if (current.start.after(start) && current.start.before(end) && end.before(current.end)) {
             boolean overLimit = current.value + value > limit;
-            if (!overLimit && current.pre != null) {
+            if (!overLimit && current.pre != null && current.pre.end.after(start)) {
                 overLimit = this.overLimit(current.pre, start, root.start, value);
             }
             return overLimit;
         }
-        // 后面部分包含 root.start-start-root.end-end
+        // 后面部分包含 current.start-start-current.end-end
         if (current.start.before(start) && start.before(current.end) && current.end.before(end)) {
             boolean overLimit = current.value + value > limit;
-            if (!overLimit && current.next != null) {
+            if (!overLimit && current.next != null && current.next.start.before(end)) {
                 overLimit = this.overLimit(current.next, root.end, end, value);
             }
             return overLimit;
         }
-        // 不包含在前面 start-end-root.start-root.end
+        // 不包含在前面 start-end-current.start-current.end
         if (end.before(current.start)) {
-            return current.pre != null && this.overLimit(current.pre, start, end, value);
+            return this.overLimit(current.pre, start, end, value);
         }
         // 不包含在后面 current.start-current.end-start-end
         if (current.end.before(start)) {
-            return current.next != null && this.overLimit(current.next, start, end, value);
+            return this.overLimit(current.next, start, end, value);
         }
         return false;
     }
@@ -250,6 +288,7 @@ public class Interval {
                 "  }\n" +
                 "]";
         JSONArray array = JSONObject.parseArray(jsonStr);
+        System.out.println(array.toString());
         Interval interval = new Interval(4);
         for (int i = 0; i < array.size(); i++) {
             JSONObject json = array.getJSONObject(i);
