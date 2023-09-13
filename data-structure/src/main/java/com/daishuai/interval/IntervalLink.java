@@ -17,36 +17,119 @@ public class IntervalLink {
 
     private Node maxNode;
 
-    private int max;
-
     private final int limit;
 
     public IntervalLink(int limit) {
         this.limit = limit;
-        this.max = 0;
     }
+
     public void insert(Date start, Date end, int value) {
         if (start.equals(end)) {
             return;
         }
+        if (root == null && value <= 0) {
+            return;
+        }
         if (root == null) {
             root = new Node(start, end, value);
-            max = value;
+            maxNode = root;
             return;
         }
         this.insert(root, start, end, value);
+        this.findMaxNode();
+        if (value < 0) {
+            this.removeNode();
+        }
     }
 
+    public void remove(Date start, Date end, int value) {
+        this.insert(start, end, -1 * value);
+    }
+
+    private void findMaxNode() {
+        if (root == null) {
+            return;
+        }
+        Node current = root;
+        Node tem = current;
+        while (current.pre != null) {
+            current = current.pre;
+            if (tem.value < current.value) {
+                tem = current;
+            }
+        }
+        current = root;
+        while (current.next != null) {
+            current = current.next;
+            if (tem.value < current.value) {
+                tem = current;
+            }
+        }
+        maxNode = tem;
+    }
+
+    private void removeNode() {
+        if (root == null) {
+            return;
+        }
+        Node drop = root;
+        Node pre = drop.pre;
+        Node next = drop.next;
+        if (root.value <= 0) {
+            if (pre != null && next != null) {
+                pre.next = next;
+                next.pre = pre;
+                root = pre;
+            } else if (pre != null) {
+                pre.next = null;
+                root = pre;
+            } else if (next != null) {
+                next.pre = null;
+                root = next;
+            } else {
+                root = null;
+            }
+            drop.pre = null;
+            drop.next = null;
+        }
+        Node current = root;
+        while (current != null && current.pre != null) {
+            current = current.pre;
+            this.removeNode(current);
+        }
+        current = root;
+        while (current != null && current.next != null) {
+            current = current.next;
+            this.removeNode(current);
+        }
+    }
+
+    private void removeNode(Node current) {
+        if (current.value > 0) {
+            return;
+        }
+        Node pre = current.pre;
+        Node next = current.next;
+        if (pre != null && next != null) {
+            pre.next = next;
+            next.pre = pre;
+        } else if (pre != null) {
+            pre.next = null;
+        } else if (next != null) {
+            next.pre = null;
+        }
+        // 垃圾回收
+        current.pre = null;
+        current.next = null;
+    }
+
+
     private void insert(Node current, Date start, Date end, int value) {
-        if (start.equals(end)) {
+        if (start.equals(end) || value == 0) {
             return;
         }
         if (current.start.equals(start) && current.end.equals(end)) {
-            current.value += value;
-            if (max > current.value + value) {
-                max = current.value + value;
-                maxNode = current;
-            }
+            current.value = Math.max(current.value + value, 0);
             root = current;
             return;
         }
@@ -65,10 +148,6 @@ public class IntervalLink {
                 current.pre.next = tmp;
             }
             root = tmp;
-            if (tmp.value > max) {
-                max = tmp.value;
-                maxNode = tmp;
-            }
             return;
         }
         if (current.start.before(start) && current.end.equals(end)) {
@@ -82,10 +161,6 @@ public class IntervalLink {
                 current.pre.next = left;
             }
             root = tmp;
-            if (tmp.value > max) {
-                max = tmp.value;
-                maxNode = tmp;
-            }
             return;
         }
         if (current.start.before(start) && current.end.after(end)) {
@@ -102,39 +177,23 @@ public class IntervalLink {
                 current.pre.next = left;
             }
             root = tmp;
-            if (tmp.value > max) {
-                max = tmp.value;
-                maxNode = tmp;
-            }
             return;
         }
         // 2、current节点被包含
         if (current.start.equals(start) && current.end.before(end)) {
-            current.value += value;
+            current.value = Math.max(current.value + value, 0);
             this.insertNext(current, current.end, end, value);
-            if (current.value > max) {
-                max = current.value;
-                maxNode = current;
-            }
             return;
         }
         if (current.start.after(start) && current.end.equals(end)) {
-            current.value += value;
+            current.value = Math.max(current.value + value, 0);
             this.insertPre(current, start, current.start, value);
-            if (current.value > max) {
-                max = current.value;
-                maxNode = current;
-            }
             return;
         }
         if (current.start.after(start) && current.end.before(end)) {
-            current.value += value;
+            current.value = Math.max(current.value + value, 0);
             this.insertPre(current, start, current.start, value);
             this.insertNext(current, current.end, end, value);
-            if (current.value > max) {
-                max = current.value;
-                maxNode = current;
-            }
             return;
         }
         // 3、前面部分包含
@@ -149,10 +208,6 @@ public class IntervalLink {
                 current.pre.next = tmp;
             }
             this.insertPre(tmp, start, current.start, value);
-            if (tmp.value > max) {
-                max = tmp.value;
-                maxNode = tmp;
-            }
             return;
         }
         // 4、后面部分包含
@@ -167,10 +222,6 @@ public class IntervalLink {
                 current.pre.next = left;
             }
             this.insertNext(tmp, current.end, end, value);
-            if (tmp.value > max) {
-                max = tmp.value;
-                maxNode = tmp;
-            }
             return;
         }
         // 5、不包含在前面
@@ -197,10 +248,6 @@ public class IntervalLink {
             }
             current.pre = left;
             root = current;
-            if (value > max) {
-                max = value;
-                maxNode = left;
-            }
         } else {
             this.insert(current.pre, start, end, value);
         }
@@ -217,10 +264,6 @@ public class IntervalLink {
             }
             current.next = right;
             root = current;
-            if (value > max) {
-                max = value;
-                maxNode = right;
-            }
         } else {
             this.insert(current.next, start, end, value);
         }
@@ -267,7 +310,7 @@ public class IntervalLink {
             if (current.value + value > limit) {
                 return true;
             }
-            boolean isOverLimit= this.leftIsOverLimit(current, start, current.start, value);
+            boolean isOverLimit = this.leftIsOverLimit(current, start, current.start, value);
             if (isOverLimit) {
                 return true;
             }
@@ -328,7 +371,7 @@ public class IntervalLink {
         Node(Date start, Date end, int value) {
             this.start = start;
             this.end = end;
-            this.value = value;
+            this.value = Math.max(value, 0);
         }
     }
 
